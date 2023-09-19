@@ -1,6 +1,8 @@
 package order
 
-import "math"
+import (
+	"math"
+)
 
 type Item struct {
 	Id        string
@@ -19,6 +21,5 @@ func (o Order) GetTotal() float64 {
 	for _, item := range o.Items {
 		total += item.UnitPrice * float64(item.Quantity)
 	}
-
-	return math.Floor(total)
+	return math.Floor(total*100) / 100
 }
