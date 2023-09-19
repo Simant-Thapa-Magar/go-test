@@ -1,11 +1,21 @@
 package order
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
+
+type mockOrder struct {
+	mock.Mock
+}
+
+func (mo *mockOrder) randomInt(max int) int {
+	args := mo.Called(max)
+	result := args.Int(0)
+	return result
+}
 
 func TestGetTotal(t *testing.T) {
 	order := Order{
@@ -70,7 +80,30 @@ func TestGetTotalUsingTestify(t *testing.T) {
 
 	for index, order := range orders {
 		total := order.GetTotal()
-		fmt.Println("what's total ", total)
-		assert.Equal(t, total, shouldBeTotal[index], "Total should be equal")
+		assert.Equal(t, shouldBeTotal[index], total, "Total should be equal")
 	}
+}
+
+func TestMockUsingTestify(t *testing.T) {
+	mockOrder := new(mockOrder)
+	mockOrder.On("randomInt", 10).Return(1)
+
+	order := Order{
+		Id: "1",
+		Items: []Item{
+			{
+				Id:        "1",
+				Quantity:  2,
+				UnitPrice: 2.5,
+			},
+			{
+				Id:        "2",
+				Quantity:  5,
+				UnitPrice: 4.99,
+			},
+		},
+	}
+
+	luckyNumber := order.GetALuckyNumber(mockOrder)
+	assert.Equal(t, 1, luckyNumber, "Should get lucky number 1")
 }
